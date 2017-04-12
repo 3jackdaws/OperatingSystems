@@ -25,6 +25,8 @@ int main(int argc, char **argv)
     int pipe_1[2];
     int pipe_2[2];
     
+    int i = 0;
+    
     if(argc >= 4)
     {
         int i;
@@ -32,6 +34,7 @@ int main(int argc, char **argv)
         post_filter_character[0] = argv[2][0];
         
         command_array = malloc(sizeof(char *) * (argc - 2));
+        if(!command_array) exit(-3);
         for (i = 3; i<argc; i++) 
         {
             command_array[i-3] = argv[i];
@@ -40,7 +43,7 @@ int main(int argc, char **argv)
     }
     else
     {
-        fprintf(stderr, "process <x> <y> <command>\n");
+        if(fprintf(stderr, "process <x> <y> <command>\n") < 0) exit(-4);
         return -1;
     }
     
@@ -60,11 +63,11 @@ int main(int argc, char **argv)
     }
     else if(cmd_pid == 0)
     {
-        close(pipe_1[0]); //close read end
-        dup2(pipe_1[1], 1);
-        execvp(command_array[0], command_array);
+        if(close(pipe_1[0]) < 0) _exit(2); //close read end
+        if(dup2(pipe_1[1], 1) < 0) _exit(3);
+        if(execvp(command_array[0], command_array) == -1) _exit(-1);
     }
-    close(pipe_1[1]); //close write end
+    if(close(pipe_1[1]) < 0) exit(2); //close write end
     
     pre_pid = fork();
     if(pre_pid < 0){
@@ -73,14 +76,14 @@ int main(int argc, char **argv)
     }
     else if(pre_pid == 0)
     {
-        close(pipe_2[0]); //close read end
-        dup2(pipe_1[0], 0);
+        if(close(pipe_2[0]) < 0) _exit(2); //close read end
+        if(dup2(pipe_1[0], 0) < 0) _exit(3);
         
-        dup2(pipe_2[1], 1);
+        if(dup2(pipe_2[1], 1) < 0) _exit(3);
         
-        execl("./prefilter", "prefilter", pre_filter_character, (char *)0);
+        if(execl("./prefilter", "prefilter", pre_filter_character, (char *)0) == -1) _exit(-1);
     }
-    close(pipe_2[1]);
+    if(close(pipe_2[1])< 0) exit(2);
     
     post_pid = fork();
     if(post_pid < 0){
@@ -89,27 +92,19 @@ int main(int argc, char **argv)
     }
     else if(post_pid == 0)
     {
-        close(pipe_2[1]); //close write end
-        dup2(pipe_2[0], 0);
+        if(dup2(pipe_2[0], 0)) _exit(3);
         
-        execl("./postfilter", "postfilter", post_filter_character, (char *)0);
+        if(execl("./postfilter", "postfilter", post_filter_character, (char *)0) == -1) _exit(-1);
     }
     
-    wait();
+    for(i = 0; i< 3; i++){
+        
+        if (wait(&status) == -1) {     //copied directly from the wait man page
+            perror("waitpid");
+            exit(EXIT_FAILURE);
+        }
+    }
     
-    wait();
-    
-    wait();
-    
-    // waitpid(cmd_pid);
-    
-    // printf("CMD: has left\n");
-    
-    // while(waitpid(pre_pid) != pre_pid);
-    
-    // fprintf(stderr, "PRE: %d\n", waitpid(pre_pid));
-    // close(pipe_2[1]);
-    // wait();
-    
-    
+    free(command_array);
+    return 0;
 }

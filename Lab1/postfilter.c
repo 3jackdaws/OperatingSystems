@@ -41,7 +41,7 @@ int main(int argc, char **argv)
         
             
         string_size   = strlen(line_buffer);
-        // if(line_buffer[string_size-1] != '\n') fprintf(stderr, "Your input string is too long\n");
+        if(line_buffer[string_size-1] == '\n') line_buffer[string_size -1] = 0;
 
         last_char_at = last_index(filter_character, line_buffer);
         

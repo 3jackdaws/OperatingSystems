@@ -36,33 +36,27 @@ int main(int argc, char **argv)
     
     while(fgets (line_buffer, LINE_BUFFER_SIZE, stdin))
     {
-        // printf("%ld\n", (long)rval);
-        // get input line
-        // if()
-        // {
-            
-            string_size   = strlen(line_buffer);
-            // if(line_buffer[string_size-1] != '\n') fprintf(stderr, "Your input string is too long\n");
 
-            first_char_at = first_index(filter_character, line_buffer);
-            
-            filtered_string = malloc(string_size - first_char_at + 1);
-            
-            if(filtered_string == 0) return -1;
-            
-            memcpy(filtered_string, line_buffer + first_char_at, string_size - first_char_at);
-            
-            //print stderr info
-            fprintf(stderr, "%ld pre %c: %s", process_id, filter_character, line_buffer);
-            fprintf(stderr, "%ld rest: %s", process_id, filtered_string);
-            
-            //print a newline if there was no newline in the filtered string
-            if(!*filtered_string) fprintf(stderr, "\n");
-            
-            fprintf(stdout, "%s", filtered_string);
-            
-            free(filtered_string);
-        // }
+        string_size   = strlen(line_buffer);
+        if(line_buffer[string_size-1] == '\n') line_buffer[string_size -1] = 0;
+        first_char_at = first_index(filter_character, line_buffer);
+        
+        filtered_string = malloc(string_size - first_char_at + 1);
+        
+        if(filtered_string == 0) return -1;
+        
+        memcpy(filtered_string, line_buffer + first_char_at, string_size - first_char_at);
+        
+        //print stderr info
+        fprintf(stderr, "%ld pre %c: %s", process_id, filter_character, line_buffer);
+        fprintf(stderr, "%ld rest: %s\n", process_id, filtered_string);
+        
+        //print a newline if there was no newline in the filtered string
+        // if(!*filtered_string) fprintf(stderr, "\n");
+        
+        fprintf(stdout, "%s\n", filtered_string);
+        
+        free(filtered_string);
         
     }
     
