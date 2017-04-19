@@ -1,4 +1,5 @@
-COPTS=-Wall -g -c -O0
+CFLAGS=-Wall -g -c -O0
+CC=c99
 
 OBJS=memory.o \
 	main.o
@@ -9,13 +10,13 @@ clean:
 	rm -rf $(OBJS) test
 	
 test: $(OBJS)
-	c99 $(OBJS) -o test
+	$(CC) $(OBJS) -o test
 
 main.o: main.c memory.c
-	c99 $(COPTS) main.c -o $@
+	$(CC) $(CFLAGS) main.c -o $@
 	
 memory.o: memory.c
-	c99 $(COPTS) memory.c -o memory.o
+	$(CC) $(CFLAGS) memory.c -o memory.o
 	
 
 

@@ -6,6 +6,6 @@ void * my_malloc(int size);
 
 void my_free(void * ptr);
 
-void my_validate();
+int my_validate();
 
 void my_print_mem();
