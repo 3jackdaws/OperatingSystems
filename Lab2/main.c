@@ -2,31 +2,64 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 int main(int argc, char ** argv)
 {
-    /**********************************************
-     Loop through entire address space
-     **/
-    void * address = 0;
-//    for (int i = 1; i<2048; i++)
-//    {
-//        printf("Allocation Size: %d\n", i);
-//        my_mem_init();
-//        do{
-//            address = my_malloc(i);
-//        }while(address != NULL);
-//        my_print_mem();
-//        if(my_validate())
-//        {
-//            return -1;
-//        }
-//    }
+    void * address;
+    void * address1;
+    void * address2;
+    void * address3;
+    void * address4;
+    void * address5;
+    
+    for (int i = 16; i<2000; i++)
+    {
+        my_mem_init();
+        do{
+            address = my_malloc(i);
+        }while(address);
+        my_validate();
 
-    my_mem_init();
-    void * a1 = my_malloc(100);
-    my_free(a1);
-    my_validate();
-    my_print_mem();
+    }
+    
+    for (int i = 16; i<2000; i += 3)
+    {
+        my_mem_init();
+        address = my_malloc(i);
+        address1 = my_malloc(i + 1);
+        address2 = my_malloc(i + 2);
+        address3 = my_malloc(i + 3);
+        address4 = my_malloc(i + 4);
+        address5 = my_malloc(i + 5);
+        
+        if(address2)
+            my_free(address2);
+        
+        if(address4)
+            my_free(address4);
+        
+        address = my_malloc(i);
+        
+        address = my_malloc(i -2);
+        
+        address = my_malloc(i - 5);
+        
+        if(address5)
+            my_free(address5);
+        
+        address = my_malloc(i);
+        address = my_malloc(i);
+        if(address)
+            my_free(address);
+        
+        my_validate();
+        my_print_mem();
+        
+        
+        
+        
+    }
+    
     return 0;
 }
