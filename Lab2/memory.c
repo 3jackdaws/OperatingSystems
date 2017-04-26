@@ -208,12 +208,12 @@ static free_header_t * coalesce(free_header_t * block_hi,
         exit(2);
         
     }
-    my_validate();
+    
     //make one big block
     block_low->next = block_hi_tail;
     block_hi_tail->prev = block_low;
     if(block_hi == free_list)free_list = block_low;
-    my_validate();
+    
     
     
     //clean up loose ends
@@ -223,19 +223,19 @@ static free_header_t * coalesce(free_header_t * block_hi,
         block_hi->prev->next = block_low;
     }
     
-    my_validate();
+    
     block_low_tail->hash = 0;
     block_low_tail->next = 0;
     block_low_tail->prev = 0;
-    my_validate();
+    
     block_hi->hash = 0;
     block_hi->next = 0;
     block_hi->prev = 0;
-    my_validate();
     
-    my_validate();
+    
+    
     block_low->size += block_hi->size;
-    my_validate();
+    
     return block_low;
 }
 
