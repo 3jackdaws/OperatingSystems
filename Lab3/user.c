@@ -1,9 +1,12 @@
-#include "io.c"
-
+#include "userlib.c"
+const int BUFF_SIZE = 10;
 int main()
 {
-    char buffer[100];
+    
+    char buffer[BUFF_SIZE];
     int r;
+    buffer[0] = 'a';
+    
     prints("Print invalid strings:\n");
     prints("Address 123456: ");
     r = prints(123456);
@@ -43,11 +46,16 @@ int main()
     r = geti();
     printi(r);
     prints("\n");
+    gets(buffer);
     
-    prints("Get string from STDIN: \n");
+    
+    memset(buffer, 0, BUFF_SIZE);
     r = gets(buffer);
     prints("Got: ");
     prints(buffer);
+    prints("\n");
+    printi(r);
+    prints("\n");
     
-    
+    halt();
 }

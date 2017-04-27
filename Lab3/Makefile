@@ -1,4 +1,4 @@
-CC=bin/stacklc
+CC=bin/stacklc		# Ran everything on my own machine, pls no bad grade if I forget to change this
 
 all: os user
 
@@ -8,7 +8,7 @@ clean:
 os:
 	$(CC) os.c
 	
-user: io.c user.c
+user: userlib.c user.c
 	$(CC) user.c
 	
 
