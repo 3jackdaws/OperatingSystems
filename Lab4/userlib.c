@@ -9,7 +9,7 @@ int prints(char *string)
 
     io_blk.op = PRINTS_CALL;
     io_blk.buff = string;
-    io_blk.status = 0;
+    io_blk.status = strlen(string);
     syscall(&io_blk);
 
     return io_blk.status;

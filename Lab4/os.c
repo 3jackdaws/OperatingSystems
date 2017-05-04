@@ -13,6 +13,8 @@
 #include <string.h>
 
 char * g_current_buff;
+int g_current_buff_size;
+int g_current_index;
 int * g_current_op;
 
 
@@ -22,8 +24,8 @@ void do_interrupt()
         char * pio_t_ier = PIO_T_IER;
         char * pio_t_xdr = PIO_T_XDR;
 
-        if(*g_current_buff){
-            *pio_t_xdr = *g_current_buff++;
+        if(g_current_index < g_current_buff_size){
+            *pio_t_xdr = *(char*)(g_current_buff + (char *)g_current_index++);
         }else{
             *pio_t_ier = 0;
             *g_current_op |= 0x80000000;
@@ -41,9 +43,11 @@ int interrupt(){
 int do_systrap(io_blk_t *io_blk)
 {
     int bp;
+    int lp;
     char *ptr;
 
     bp = asm2("PUSHREG", BP_REG);
+    lp = asm2("PUSHREG", LP_REG);
 
     ptr = (char *)io_blk;
     ptr += bp;
@@ -56,11 +60,19 @@ int do_systrap(io_blk_t *io_blk)
         char * pio_t_ier = PIO_T_IER;
         char * pio_t_xdr = PIO_T_XDR;
         
+        g_current_buff_size = io_blk->status;
+        io_blk->status = 0;
         g_current_buff = io_blk->buff;
         g_current_op = &io_blk->op;
+        if((int)g_current_buff + g_current_buff_size < lp){
+            *pio_t_ier = (char)PIO_T_IID_XMIT;
+            *pio_t_xdr = *g_current_buff;
+            g_current_index = 1;
+        }
+        else{
+            io_blk->status = 1;
+        }
         
-        *pio_t_ier = (char)PIO_T_IID_XMIT;
-        *pio_t_xdr = *g_current_buff++;
         
     } else if (io_blk->op == EXIT_CALL) {
         asm("HALT");
