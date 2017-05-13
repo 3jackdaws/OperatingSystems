@@ -8,6 +8,7 @@
 
 #include "ts_queue.h"
 #include <pthread.h>
+#include <semaphore.h>
 
 
 
@@ -23,6 +24,7 @@ typedef struct
     item_t *first;
     item_t *last;
     pthread_mutex_t lock;
+    sem_t has_content;
 } my_queue_t;
 
 /********************************************************************** 
@@ -46,6 +48,7 @@ queue_t Q_Init()
     queue->closed = 0;
     
     pthread_mutex_init(&(queue->lock), NULL);
+    sem_init(&(queue->has_content), 0, 0);
 
     return (queue_t)queue;
 }
@@ -122,6 +125,7 @@ int Q_Enqueue(queue_t q, char *buffer)
         queue->last->next = item;
         queue->last = item;
     }
+    sem_post(&(queue->has_content));
     pthread_mutex_unlock(&(queue->lock));
 
     return 0;
@@ -144,7 +148,7 @@ char *Q_Dequeue(queue_t q)
     my_queue_t *queue = (my_queue_t *)q;
     char *buffer = NULL;
     item_t *item;
-
+    sem_wait(&(queue->has_content));
     pthread_mutex_lock(&(queue->lock));
     if (queue->first != NULL)
     {
