@@ -83,12 +83,21 @@ int main(int argc, char **argv)
     }
 
     queue = Q_Init();
+    if(!queue){
+        fprintf(stderr, "Error creating queue\n");
+        exit(3);
+    }
 
     
     for (ii=0; ii<n_consumers; ii++)
     {
-        pthread_create(&consumer_threads[ii], NULL, &consumer_start, (void*)(queue));
-        fprintf(stderr, "Create consumer\n");
+        if(pthread_create(&consumer_threads[ii], NULL, &consumer_start, (void*)(queue))){
+            fprintf(stderr, "pthread_create error\n");
+            exit(1);
+        }else{
+            fprintf(stderr, "Create consumer\n");
+        }
+        
     }
 
     for (ii=2; ii<argc; ii++)
@@ -98,14 +107,20 @@ int main(int argc, char **argv)
         args->filename = argv[ii];
         // fprintf(stderr, "Filename is: %s\n", args->filename);
         args->queue = queue;
-        pthread_create(&producer_threads[ii], NULL, &producer_start, args);
+        if(pthread_create(&producer_threads[ii], NULL, &producer_start, args)){
+            fprintf(stderr, "pthread_create error\n");
+            exit(1);
+        }
         fprintf(stderr, "Create producer\n");
         
     }
 
     for (ii=2; ii<argc; ii++)
     {
-        pthread_join(producer_threads[ii], NULL);
+        if(pthread_join(producer_threads[ii], NULL)){
+            fprintf(stderr, "pthread_join error\n");
+            exit(2);
+        }
         fprintf(stderr, "Join producer\n");
     }
     
@@ -119,7 +134,10 @@ int main(int argc, char **argv)
     
     for (ii=0; ii<n_consumers; ii++)
     {
-        pthread_join(consumer_threads[ii], NULL);
+        if(pthread_join(consumer_threads[ii], NULL)){
+            fprintf(stderr, "pthread_join error\n");
+            exit(2);
+        }
         fprintf(stderr, "Join consumer\n");
     }
     

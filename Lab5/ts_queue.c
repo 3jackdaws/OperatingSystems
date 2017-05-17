@@ -50,12 +50,10 @@ queue_t Q_Init()
     queue->closed = 0;
     
     if(pthread_mutex_init(&(queue->lock), NULL)){
-        fprintf(stderr, "Error initializing queue mutex.");
-        pthread_exit((void*)GENERAL_ERROR);
+        return (queue_t)NULL;
     }
     if(sem_init(&(queue->has_content), 0, 0)){
-        fprintf(stderr, "Error initializing queue semaphore.  Exiting immediately.");
-        pthread_exit((void*)GENERAL_ERROR);
+        return (queue_t)NULL;
     }
     
 
@@ -126,8 +124,7 @@ int Q_Enqueue(queue_t q, char *buffer)
     item->next = NULL;
 
     if(pthread_mutex_lock(&(queue->lock))){
-        fprintf(stderr, "Pthread lock error.");
-        pthread_exit((void*)GENERAL_ERROR);
+        return 1;
     }
     if (queue->first == NULL)
     {
@@ -138,13 +135,11 @@ int Q_Enqueue(queue_t q, char *buffer)
         queue->last = item;
     }
     if(sem_post(&(queue->has_content))){
-        fprintf(stderr, "Queue semaphore post error.");
-        pthread_exit((void*)GENERAL_ERROR);
+        return 2;
     }
     if(pthread_mutex_unlock(&(queue->lock)))
     {
-        fprintf(stderr, "Pthread unlock error.");
-        pthread_exit((void*)GENERAL_ERROR);
+        return 3;
     }
 
     return 0;
@@ -169,13 +164,11 @@ char *Q_Dequeue(queue_t q)
     item_t *item;
     if(sem_wait(&(queue->has_content)))
     {
-        fprintf(stderr, "Queue semaphore wait error.");
-        pthread_exit((void*)GENERAL_ERROR);
+        return (char *)NULL;
     }
     
     if(pthread_mutex_lock(&(queue->lock))){
-        fprintf(stderr, "Pthread lock error.");
-        pthread_exit((void*)GENERAL_ERROR);
+        return (char *)NULL;
     }
     if (queue->first != NULL)
     {
@@ -188,8 +181,7 @@ char *Q_Dequeue(queue_t q)
         free(item);
     }
     if(pthread_mutex_unlock(&(queue->lock))){
-        fprintf(stderr, "Pthread unlock error.");
-        pthread_exit((void*)GENERAL_ERROR);
+        return (char *)NULL;
     }
     return buffer;
 }
