@@ -45,7 +45,7 @@ void yield(){
 /***************************************
  Description: Halts the machine
  * *************************************/
-int halt()
+int exit()
 {
     io_blk_t args;
     args.op = EXIT_CALL;
@@ -54,7 +54,7 @@ int halt()
     return args.addr;
 }
 
-int get_time()
+int time()
 {
     io_blk_t args;
     args.op = TIME_CALL;

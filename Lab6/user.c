@@ -1,26 +1,23 @@
 
-#include "userlib.c"
+#include "userlib.h"
 
 int main()
 {
     
-    if(exec("hdjshdj") != 0){
+    if(exec("d") != 0){
         
         prints("EXEC FAILED\n");
     }
     int counter = 0;
-    prints("******************** START *****************\n");
-    while(counter < 10){
-        // halt();
-        prints("******  USER.C - ");
-        printi(counter);
-        prints("\n");
-        printi(get_time());
+    prints("******************** START USER.C *****************\n");
+    while(counter < 10000){
         counter++;
-        yield();
+        if(counter % 100 == 0){
+            prints("USER.C - ");
+            printi(counter);
+            prints("\n");
+        } 
     }
     
-    prints("**********************   FIN   ****************\n");
-    printi(halt());
-    prints("");
+    prints("**********************   FIN USER.C   ****************\n");
 }

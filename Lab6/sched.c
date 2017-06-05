@@ -4,9 +4,11 @@
 
 #include "machine_defines.h"
 #include <timer.h>
+#include "queue.h"
 const int MAX_PROCESSES = 10;
 static Process scheduled_processes[MAX_PROCESSES];
 static int current_process_index;
+static queue_t ready_queue;
 
 int t_printi(int i)
 {
@@ -34,6 +36,7 @@ int t_printx(int i)
 
 Process * sched_init()
 {
+    ready_queue = Q_Init(MAX_PROCESSES);
     scheduled_processes[0].status = P_RUNNING;
     current_process_index = 0;
     int i;
@@ -109,7 +112,7 @@ int sched_exec(char * filename)
     process->status = P_READY;
     asm2("POPREG", REG_BP, bp);
     asm2("POPREG", REG_LP, lp);
-    
+    Q_Enqueue(ready_queue, process);
     return 0;
 }
 
@@ -131,11 +134,7 @@ Process * next_process()
         counter++;
         p_number = index % MAX_PROCESSES;
         if(p_number == 0) p_number = 1;
-        // if(scheduled_processes[p_number].status != P_UNUSED) t_printi(p_number);
-        //     asm("OUTS", "PROC: ");
-            // t_printi(p_number);
-        //     t_printi(scheduled_processes[p_number].status);
-        // }
+        
         
         
         if(scheduled_processes[p_number].status == P_SLEEPING){

@@ -310,7 +310,7 @@ int startup__()
     Interrupt_Vector[3] = (int)timer_interrupt;
     asm2("POPREG", REG_IVEC, &Interrupt_Vector);
     
-    set_timer_rate(1);
+    set_timer_rate(10);
     
     int base;
     int limit;
@@ -329,7 +329,7 @@ int startup__()
     sys_printi(size);
     
     g_current_process = sched_init();
-    sched_exec("user.slb");
+    sched_exec("test.slb");
 
     
     while(1){
